@@ -197,4 +197,6 @@
     <color name="floating_console_content_bg">#99262626</color>
     <color name="floating_console_title_bar_bg">#cc181818</color>
 
+    <color name="console_debug">#9E9E9E</color>
+    <color name="console_verbose">#BDBDBD</color>
 </resources>
