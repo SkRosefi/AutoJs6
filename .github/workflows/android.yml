@@ -1,18 +1,15 @@
 name: Android CI
-
 on:
   push:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
-
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
-
+      
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
@@ -20,12 +17,17 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
+      - name: Fix Gradle Version to 8.10.2
+        run: |
+          echo "distributionUrl=https\://services.gradle.org/distributions/gradle-8.10.2-bin.zip" > gradle/wrapper/gradle-wrapper.properties
+          cat gradle/wrapper/gradle-wrapper.properties
+
       - name: Install CMake 3.10.2 manually
         run: |
           wget https://cmake.org/files/v3.10/cmake-3.10.2-Linux-x86_64.sh
           chmod +x cmake-3.10.2-Linux-x86_64.sh
           sudo ./cmake-3.10.2-Linux-x86_64.sh --skip-license --prefix=/usr/local
-          
+
       - name: Install Ninja
         run: |
           sudo apt-get update
@@ -35,13 +37,12 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with Gradle (assembleInrtRelease)
-        run: ./gradlew assembleInrtRelease
+        run: ./gradlew assembleInrtRelease --stacktrace
 
       - name: Build with Gradle (assembleAppRelease)
-        run: ./gradlew assembleAppRelease
+        run: ./gradlew assembleAppRelease --stacktrace
 
       - name: Upload arm64 artifacts
-        id: upload-arm64-apk
         uses: actions/upload-artifact@v4
         with:
           name: release-arm64-apk
@@ -49,7 +50,6 @@ jobs:
         continue-on-error: true
 
       - name: Upload armv7 artifacts
-        id: upload-armv7-apk
         uses: actions/upload-artifact@v4
         with:
           name: release-armv7-apk
@@ -57,7 +57,6 @@ jobs:
         continue-on-error: true
 
       - name: Upload universal artifacts
-        id: upload-universal-apk
         uses: actions/upload-artifact@v4
         with:
           name: release-universal-apk
